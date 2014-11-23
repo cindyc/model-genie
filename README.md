@@ -1,4 +1,4 @@
 type-composer
 =============
 
-Composite types with dettachable fields using graph db
+Dynamically create archivable types  with dettachable fields using graph db
