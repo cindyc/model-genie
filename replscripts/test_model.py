@@ -1,9 +1,4 @@
-from ..base import ArchivableModel
-
+from modelgenie.base import ArchivableModel
 from schematics.types import StringType, NumberType
 
-
-class Person(ArchivableModel):
-    first_name = StringType()
-    last_name = StringType()
-
+builtin_types = ArchivableModel.list_types()

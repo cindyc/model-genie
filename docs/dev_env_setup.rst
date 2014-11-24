@@ -1,3 +1,13 @@
+Setting up MongoDB: 
+==================
+brew update
+brew install mongodb
+pip install pymongo
+
+
+
+Setting Up Bulbs, Neo4j and Gremlin
+===================================
 1. Download the Community Edition Neo4J from neo4j.com/download
 
 2. Install Neo4j: 
