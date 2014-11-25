@@ -24,13 +24,16 @@ class Definition(Model):
                 setattr(self, key, value)
 
 
+class TypeDefinition(Definition):
+    is_model = BooleanType()
+
+
 class CollectionDefinition(Definition): 
     """Defines a Collection
     """
     # collection type can be list or dict
-    collection_type = StringType()
     is_ordered = BooleanType()
-    model_types = ListType(StringType())
+    allow_type = ModelType(TypeDefinition)
 
 
 class FieldDefinition(Definition):
@@ -42,7 +45,7 @@ class FieldDefinition(Definition):
     min_size = IntType()
     max_size = IntType()
     messages = DictType(StringType(), ListType(StringType))
-    collection_definition = CollectionDefinition()
+    collection_definition = ModelType(CollectionDefinition)
 
 
 class ModelDefinition(Definition):

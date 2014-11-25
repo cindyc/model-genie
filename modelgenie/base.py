@@ -9,7 +9,6 @@ from schematics.models import Model
 # they'll be fixed 
 from schematics.types.base import * 
 from schematics.types.compound import *
-#from modelgenie.builtins import *
 
 from modelgenie.definitions import ModelDefinition, FieldDefinition
 from archiver import FilebasedTypeArchiver
@@ -22,8 +21,7 @@ TODOs:
 
 class ModelGenie(object):
     """ModelGenie makes a Model's definition persistable
-    It does multi-way convertions and validations: """
-    """
+    It does multi-way conversions, validations and serializations
     - Define a model in json and turn it into a ModelDefinition
     - Define an ORM model (i.e. django, schematics, sqlalchemy) and turn it into a
       ModelDefinition
@@ -47,6 +45,7 @@ class SchematicsModelGenie(ModelGenie):
     field_type_mapping = {
         'String': 'schematics.types.base.StringType',
         'Int': 'schematics.types.base.IntType',
+        'List': 'schematics.type.compound.ListType',
     }
 
     # mapping the FieldDefnition keys to the schematics field definition
@@ -85,19 +84,18 @@ class SchematicsModelGenie(ModelGenie):
         return model_def
     
     @classmethod
-    def create_model(cls, data):
-        """Create a schematic Model
-        data can be a ModelDefintion or dict
+    def create_model(cls, model_def):
+        """Create a schematic Model based on model_defintion 
         """
-        if isinstance(data, ModelDefinition):
-            data = data.serialize()
-        print 'data is {}'.format(data)
+        # model_def can be passed in as ModelDefinition or dict
+        if isinstance(model_def, ModelDefinition):
+            model_def = model_def.serialize()
 
         cls_attrs = {}
-        for field_def in data['field_definitions']:
+        for field_def in model_def['field_definitions']:
             field_impl = cls._to_field_impl(field_def)
             cls_attrs[field_def['name']] = field_impl
-        class_name = data['name']
+        class_name = model_def['name']
         klass = type(class_name, (Model, ), cls_attrs)
         return klass
 
@@ -105,23 +103,15 @@ class SchematicsModelGenie(ModelGenie):
     def _to_field_impl(cls, field_def):
         """Given a FieldDefinition, convert to to a impl specific Field
         """
-        if isinstance(field_def, FieldDefinition):
+        if isinstance(field_def, FieldDefinition):        
             field_def = field_def.serialize()
-        field_type_impl_name = cls._to_type_impl(field_def['type'])
-        print 'field_type_impl_name is {}'.format(field_type_impl_name)
-        # TODO (cc) we'll deal with compound types later
-        if field_type_impl_name in ('ListType', 'ModelType'):
-            print 'Skipping ListType and ModelType'
-        else:
-            # TODO (cc) fix this part
-            field_type = globals()[field_type_impl_name.split('.')[-1]]
-            print 'field_type is {}'.format(field_type)
-            field = field_type()
 
-            for def_key, value in field_def.iteritems():
-                if def_key not in ('name', 'type'):
-                    impl_key = cls.field_def_key_mapping[def_key]
-                    setattr(field, impl_key, value)
+        field = cls._to_type_impl(field_def)
+
+        for def_key, value in field_def.iteritems():
+            if def_key not in ('name', 'type', 'collection_definition'):
+                impl_key = cls.field_def_key_mapping[def_key]
+                setattr(field, impl_key, value)
         return field
 
     @classmethod
@@ -138,13 +128,50 @@ class SchematicsModelGenie(ModelGenie):
             return imp_type_name
 
     @classmethod
-    def _to_type_impl(cls, type_def):
+    def _to_type_impl(cls, field_def):
         """Given a type definition, return a schematics type
         """
-        if type_def in cls.field_type_mapping:
-            return cls.field_type_mapping[type_def]
+        if field_def['type'] == 'Collection':
+            return cls._to_compound_type_impl(field_def)
         else:
-            return type_def
+            return cls._to_base_type_impl(field_def)
+
+    @classmethod
+    def _to_base_type_impl(cls, field_def):
+        """Given a type definition, turn it into a impl specific type
+        """
+        if field_def['type'] in cls.field_type_mapping:
+            impl_type_name = cls.field_type_mapping[field_def['type']]
+        else:
+            impl_type_name = field_def['type']
+        field_type = globals()[impl_type_name.split('.')[-1]]
+        print 'field_type is {}'.format(field_type)
+        return field_type()
+
+    @classmethod
+    def _to_compound_type_impl(cls, field_def):
+        """give a field definition , turn it into a impl specific compound type
+        """
+        collection_def = field_def['collection_definition']
+        collection_type_name = collection_def['type']
+        if collection_type_name in cls.field_type_mapping:
+            col_impl_type_name = cls.field_type_mapping[collection_type_name]
+        else:
+            col_impl_type_name = collection_type_name
+        print 'col_impl_type_name is {}'.format(col_impl_type_name)
+        col_impl_type = globals()[col_impl_type_name.split('.')[-1]]
+        allowed_type = collection_def['allow_type']
+        print 'allowed_type is {}'.format(allowed_type)
+        if not allowed_type['is_model']:
+            # if it's String, Int etc 
+            allowed_type_impl = cls._to_type_impl(allowed_type)
+        else:
+            model_type_impl = globals()['ModelType']
+            # I don't know what to do here 
+            allowed_type_impl = model_type_impl()
+
+        print 'allowed_type_impl is {}'.format(allowed_type_impl)
+        return col_impl_type(allowed_type_impl)
 
     @classmethod
     def get_type_name(cls, obj): 
@@ -197,7 +224,6 @@ class ArchivableModel(Model):
             field_type_name = serialized_field['type_name'].split('.')[-1]
             # TODO (cc) fix this part
             field_type = globals()[field_type_name]
-            print 'field_type is {}'.format(field_type)
             if field_type_name in ('ListType', 'ModelType'):
                 # TODO (cc) fix this: get the type for ModelType from data
                 # cls_attrs[field_name] = field_type(ModelType(Person))
@@ -212,7 +238,6 @@ class ArchivableModel(Model):
         """Load a Model type
         """
         if name:
-            print 'loading type with name = {}'.format(name)
             data = cls.archiver.query({'type_name': name})
         klass = cls.create_type(data)
         return klass

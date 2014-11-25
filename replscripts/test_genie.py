@@ -1,6 +1,24 @@
 from modelgenie.base import SchematicsModelGenie, ArchivableModel
 from modelgenie.builtins import (Person, Place, Event)
+from modelgenie.definitions import (ModelDefinition, FieldDefinition, 
+                                    TypeDefinition, CollectionDefinition)
 
+event_model = ModelDefinition(name='Event', type='Event')
+
+model_type_def = TypeDefinition(is_model=False, type='String')
+
+attendees_collection = CollectionDefinition(name='attendees_collection',
+                              type='List', 
+                              allow_type=model_type_def)
+
+attendees_field = FieldDefinition(name='attendees',
+                                  type='Collection',
+                                  collection_definition=attendees_collection)
+event_model.field_definitions.append(attendees_field)
+
+def test_convert_def_to_model():
+    model = SchematicsModelGenie.create_model(event_model)
+    return model
 
 def test_create_model():
     model_def = SchematicsModelGenie.get_definition(Person)
