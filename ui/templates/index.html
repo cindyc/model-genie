@@ -1,0 +1,14 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+    <title>Builtin Types</title>
+</head>
+<body>
+    <ul id="types">
+    {% for type in types %}
+        <li><a href="{{ type["type_name"] }}">{{ type["type_name"] }}</a></li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
+
