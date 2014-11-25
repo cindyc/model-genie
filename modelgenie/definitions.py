@@ -25,7 +25,10 @@ class Definition(Model):
 
 
 class TypeDefinition(Definition):
+    """This is essentially to turn a Model into a ModelType
+    """
     is_model = BooleanType()
+    model_def = DictType(StringType, StringType)
 
 
 class CollectionDefinition(Definition): 
@@ -34,7 +37,6 @@ class CollectionDefinition(Definition):
     # collection type can be list or dict
     is_ordered = BooleanType()
     allow_type = ModelType(TypeDefinition)
-
 
 class FieldDefinition(Definition):
     """Defines a Field
@@ -53,3 +55,6 @@ class ModelDefinition(Definition):
     """
     bases = ListType(StringType(), default=[])
     field_definitions = ListType(ModelType(FieldDefinition), default=[])
+
+
+

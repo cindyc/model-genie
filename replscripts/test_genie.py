@@ -5,7 +5,15 @@ from modelgenie.definitions import (ModelDefinition, FieldDefinition,
 
 event_model = ModelDefinition(name='Event', type='Event')
 
-model_type_def = TypeDefinition(is_model=False, type='String')
+string_type_def = TypeDefinition(is_model=False, type='String')
+person_model_def = ModelDefinition(name='Person', type='Person',
+                                   field_definitions=[
+                                        FieldDefinition(name='first_name', type='String'),
+                                        FieldDefinition(name='last_name', type='String'),
+                                    ],
+                                  )
+model_type_def = TypeDefinition(is_model=True, type='Person', 
+                                model_def=person_model_def.serialize())
 
 attendees_collection = CollectionDefinition(name='attendees_collection',
                               type='List', 
@@ -15,6 +23,7 @@ attendees_field = FieldDefinition(name='attendees',
                                   type='Collection',
                                   collection_definition=attendees_collection)
 event_model.field_definitions.append(attendees_field)
+
 
 def test_convert_def_to_model():
     model = SchematicsModelGenie.create_model(event_model)
