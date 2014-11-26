@@ -19,4 +19,3 @@ definition json
 - ModelDefintions can be serialized to json and persisted to database or the filesystem, they can then be queried and be turned into ORM model on-demand
 - The rest APIs provide an universal interface to define models. 
 - Different ORM systems are supported through plugins
-- Raw data can be parsed by ModelDefinition parsers and turn into different model types
