@@ -1,5 +1,6 @@
 model-genie
 =============
+Turn unstructured data into structured data.
 
 What does it do?
 ===============
@@ -10,6 +11,8 @@ ModelDefinition
 - Define a ModelDefinition and serialize it to json
 - Define a ModelDefinition and turn it into an ORM model
 - Define a model in json and turn it into an ORM model
+- Add parsers as plugins to turn raw text data into models
+- Training system to coerce raw data into model definitions
 
 
 Why use it?  
