@@ -3,7 +3,7 @@ from modelgenie.builtins import (Person, Place, Event)
 from modelgenie.definitions import (ModelDefinition, FieldDefinition, 
                                     TypeDefinition, CollectionDefinition)
 
-event_model = ModelDefinition(name='Event', type='Event')
+event_model_def = ModelDefinition(name='Event', type='Event')
 
 string_type_def = TypeDefinition(is_model=False, type='String')
 person_model_def = ModelDefinition(name='Person', type='Person',
@@ -22,11 +22,11 @@ attendees_collection = CollectionDefinition(name='attendees_collection',
 attendees_field = FieldDefinition(name='attendees',
                                   type='Collection',
                                   collection_definition=attendees_collection)
-event_model.field_definitions.append(attendees_field)
+event_model_def.field_definitions.append(attendees_field)
 
 
 def test_convert_def_to_model():
-    model = SchematicsModelGenie.create_model(event_model)
+    model = SchematicsModelGenie.create_model(event_model_def)
     return model
 
 def test_create_model():
