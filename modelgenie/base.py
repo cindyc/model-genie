@@ -1,4 +1,4 @@
-"""Extend the schematics Model to make it persistable
+"""ModelGenie
 """
 import json
 from collections import OrderedDict

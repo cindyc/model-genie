@@ -25,10 +25,17 @@ class Definition(Model):
 
 
 class TypeDefinition(Definition):
-    """This is essentially to turn a Model into a ModelType
+    """Turns a Model into a ModelType
     """
-    is_model = BooleanType()
-    model_def = DictType(StringType, StringType)
+    pass
+
+class ListTypeDefinition(TypeDefinition):
+    is_ordered = BooleanType()
+    allow_types = ListType(ModelType(TypeDefinition))
+
+
+class ModelTypeDefinition(Definition): 
+    model_def = DictType(StringType(), StringType())
 
 
 class CollectionDefinition(Definition): 
@@ -36,7 +43,7 @@ class CollectionDefinition(Definition):
     """
     # collection type can be list or dict
     is_ordered = BooleanType()
-    allow_type = ModelType(TypeDefinition)
+    allow_types = ListType(ModelType(TypeDefinition))
 
 class FieldDefinition(Definition):
     """Defines a Field
@@ -47,7 +54,7 @@ class FieldDefinition(Definition):
     min_size = IntType()
     max_size = IntType()
     messages = DictType(StringType(), ListType(StringType))
-    collection_definition = ModelType(CollectionDefinition)
+    compound_type = DictType(StringType(), StringType())
 
 
 class ModelDefinition(Definition):
@@ -57,4 +64,16 @@ class ModelDefinition(Definition):
     field_definitions = ListType(ModelType(FieldDefinition), default=[])
 
 
+def to_model_type(model_def): 
+    """Convenient method to turn a ModelDefinition into a ModelTypeDefinition
+    """
+    return ModelTypeDefinition(type='{}Type'.format(model_def.name),
+                               model_def=model_def.serialize()
+                               ).serialize()
 
+def to_list_type(model_def): 
+    """Convenient method to turn a ModelDefinition into a ListTypeDefinition
+    """
+    return ListTypeDefinition(type='{}Type'.format(model_def.name),
+                              model_def=model_def.serialize()
+                             ).serialize()
