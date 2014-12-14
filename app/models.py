@@ -41,3 +41,9 @@ attraction_def = ModelDefinition(name='Attraction', type='Attraction',
                                         compound_type=admission_def._to_list_type(),
                                         ),
                 ])
+
+d1 = attraction_def
+m1 = ModelGenie.get_model(d1)
+d2 = ModelGenie.get_definition(m1)
+m2 = ModelGenie.get_model(d2)
+d3 = ModelGenie.get_definition(m2)

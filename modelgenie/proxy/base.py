@@ -22,19 +22,23 @@ class ModelProxy(object):
     def get_definition(cls, model):
         """Extract ModelDefinition from a Schematics Model
         """
-        model_type = model.__name__
-        model_def = ModelDefinition(name=model_type, type=model_type)
+        model_def = ModelDefinition(name=model.__name__, type=model.__name__)
         for field_name, field_type in model._fields.iteritems():
             # get the schematics field type and convert to our field type
-            field_def = FieldDefinition(name=field_name, 
-                                        type=cls._to_type_def(field_type))
             field_type_data = field_type.__dict__
+            _type, _compound_type = cls._to_type_def(field_type)
+            field_def = FieldDefinition(name=field_name, 
+                                        type=_type, 
+                                        compound_type=_compound_type
+                                       )
             for def_name, getter_key in cls.field_def_key_mapping.iteritems():
                 if getter_key in field_type_data:
                     field_value = field_type_data[getter_key]
+                    # temporary hack, owner_model is a class and it's not
+                    # serializable
+                    if getter_key == 'owner_model':
+                        field_value = ''
                     setattr(field_def, def_name, field_value)
-                else:
-                    print 'Warning: key {} does not exist'.format(def_name)
             model_def.field_definitions.append(field_def)
         return model_def
 
@@ -73,17 +77,38 @@ class ModelProxy(object):
 
 
     @classmethod
-    def _to_type_def(cls, imp_field_type):
-        """Given a impl field type, return a ModelGenie field type
+    def _to_type_def(cls, field):
+        """Given a impl field, return a ModelGenie FieldDefinition
         """
-        imp_type_name = cls._get_type_name(imp_field_type)
+        imp_type_name = cls._get_type_name(field)
         # it's unfortunate that field_type_mapping has to be inverted
         inverted_field_type_mapping = dict(zip(cls.field_type_mapping.values(), 
                                           cls.field_type_mapping.keys()))
         if imp_type_name in inverted_field_type_mapping: 
-            return inverted_field_type_mapping[imp_type_name]
+            field_type_def = inverted_field_type_mapping[imp_type_name]
         else:
-            return imp_type_name
+            raise Exception("imp_type_name {} not in mapping".format(imp_type_name))
+
+        if imp_type_name.split('.')[-1] in ('ListType', 'ModelType'):
+            return (field_type_def, cls._to_compound_type_def(field))
+        else:
+            return (field_type_def, {'model_def': field_type_def})
+
+    @classmethod
+    def _to_compound_type_def(cls, field):
+        """Give a compound schematics field type, return a ModelDefinition
+        """
+        field_type = field.__class__.__name__
+        if field_type == 'ModelType':
+            model_class = field.model_class
+            model_def = cls.get_definition(model_class)
+            return model_def._to_model_type()
+        elif field_type == 'ListType':
+            model_class = field.field.model_class
+            model_def = cls.get_definition(model_class)
+            return model_def._to_list_type()
+        else:
+            return None
 
     @classmethod
     def _to_type_impl(cls, field_def):
@@ -111,9 +136,7 @@ class ModelProxy(object):
         """
         if field_def['type'] == 'Model':
             model_def = field_def['compound_type']['model_def']
-            print "model_def is {}".format(model_def)
             model_class = cls.get_model(model_def)
-            print 'model_class is {}'.format(model_class)
             model_impl_type_name = cls.field_type_mapping['Model']
             model_impl_type = cls._load_class(model_impl_type_name)
             return model_impl_type(model_class)

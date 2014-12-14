@@ -55,10 +55,8 @@ class SchematicsProxy(ModelProxy):
         else:
             collection_impl_type_name = collection_type_name
         collection_impl_type = cls._load_class(collection_impl_type_name)
-        print 'collection_impl_type is {}'.format(collection_impl_type)
 
         allowed_type = field_def['compound_type']['allow_type']
-        print 'allow_type is {}'.format(allowed_type)
 
         # handle the model embedded in the type, i.e. the Person in
         # ModelType(Person)
