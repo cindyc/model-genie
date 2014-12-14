@@ -1,9 +1,8 @@
-from modelgenie.base import SchematicsModelGenie, ArchivableModel
+from modelgenie.base import ModelGenie
 from modelgenie.definitions import (ModelDefinition, FieldDefinition, 
                                     TypeDefinition, ListTypeDefinition,
                                     ModelTypeDefinition, CollectionDefinition,
-                                    to_model_type, to_list_type)
-from schematics.models import ModelType
+                                   )
 
 
 location_def = ModelDefinition(name='Location', type='Location',
@@ -24,33 +23,21 @@ daytime_range_def = ModelDefinition(name='DayTimeRange', type='DayTimeRange',
 admission_def = ModelDefinition(name='Admission', type='Admission',
                     field_definitions=[
                         FieldDefinition(name='category', type='String'),
-                        FieldDefinition(name='price', type='Number', unit='$'),
+                        FieldDefinition(name='price', type='Int'),
                 ])
-
-loc_type_def = ModelTypeDefinition(type='LocationType', 
-                                   model_def=location_def,
-                                  )
-
-hours_type_def = ListTypeDefinition(type='HoursType',
-                                    is_ordered=True,
-                                    model_def=daytime_range_def,
-                                   )
-admission_type_def = ModelTypeDefinition(is_model=True, type='Admission',
-                                    model_def=admission_def, 
-                                   )
 
 attraction_def = ModelDefinition(name='Attraction', type='Attraction',
                     field_definitions=[
                         FieldDefinition(name='address', 
                                         type='Model',
-                                        compound_type=to_model_type(location_def),
+                                        compound_type=location_def._to_model_type(),
                                         ),
                         FieldDefinition(name='category', 
                                         type='String'),
                         FieldDefinition(name='hours', type='List', 
-                                        compound_type=to_list_type(daytime_range_def),
+                                        compound_type=daytime_range_def._to_list_type(),
                                         ),
                         FieldDefinition(name='admission', type='List',
-                                        compound_type=to_model_type(admission_def),
+                                        compound_type=admission_def._to_list_type(),
                                         ),
                 ])

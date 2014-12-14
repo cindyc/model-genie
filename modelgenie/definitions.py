@@ -5,6 +5,12 @@ from schematics.types.base import (StringType, IntType,
                                    BooleanType)
 from schematics.types.compound import ListType, DictType, ModelType
 
+"""
+@TODO: 
+- Don't use schematics for validating and serializing definitions, this
+  is just for prototyping
+
+"""
 
 class Definition(Model):
     """Base class of definitions. 
@@ -21,7 +27,12 @@ class Definition(Model):
         super(Definition, self).__init__()
         for key, value in kwargs.iteritems():
             if hasattr(self, key):
-                setattr(self, key, value)
+                # this is a hack to allow passing ModelDefinition() instead of 
+                # ModelDefinition().serialize()
+                if type(self._fields[key]) == DictType and type(value) != dict:
+                    setattr(self, key, value.serialize())
+                else:
+                    setattr(self, key, value)
 
 
 class TypeDefinition(Definition):
@@ -29,13 +40,19 @@ class TypeDefinition(Definition):
     """
     pass
 
-class ListTypeDefinition(TypeDefinition):
-    is_ordered = BooleanType()
-    allow_types = ListType(ModelType(TypeDefinition))
 
-
-class ModelTypeDefinition(Definition): 
+class ModelTypeDefinition(TypeDefinition): 
+    type = 'Model'
     model_def = DictType(StringType(), StringType())
+
+
+class ListTypeDefinition(TypeDefinition):
+    """Definition for list of models
+    """
+    type = 'List'
+    is_ordered = BooleanType()
+    # need to support allowing a list of types
+    allow_type = DictType(StringType(), StringType())
 
 
 class CollectionDefinition(Definition): 
@@ -43,7 +60,7 @@ class CollectionDefinition(Definition):
     """
     # collection type can be list or dict
     is_ordered = BooleanType()
-    allow_types = ListType(ModelType(TypeDefinition))
+    allow_types = ListType(DictType(StringType(), StringType()))
 
 class FieldDefinition(Definition):
     """Defines a Field
@@ -63,17 +80,11 @@ class ModelDefinition(Definition):
     bases = ListType(StringType(), default=[])
     field_definitions = ListType(ModelType(FieldDefinition), default=[])
 
-
-def to_model_type(model_def): 
-    """Convenient method to turn a ModelDefinition into a ModelTypeDefinition
-    """
-    return ModelTypeDefinition(type='{}Type'.format(model_def.name),
-                               model_def=model_def.serialize()
-                               ).serialize()
-
-def to_list_type(model_def): 
-    """Convenient method to turn a ModelDefinition into a ListTypeDefinition
-    """
-    return ListTypeDefinition(type='{}Type'.format(model_def.name),
-                              model_def=model_def.serialize()
-                             ).serialize()
+    def _to_model_type(self):
+        return ModelTypeDefinition(type='{}Type'.format(self.name),
+                                   model_def=self
+                                  )
+    def _to_list_type(self):
+        return ListTypeDefinition(type='{}ListType'.format(self.name),
+                                  allow_type=self
+                                 )
