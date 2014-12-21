@@ -1,56 +1,154 @@
-<head>
-    <meta charset="utf-8">
-    <title>Dynamic Form Fields - Add &amp; Remove - Bootsnipp.com</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
-    <style type="text/css">
-    * {
-  .border-radius(0) !important;
-}
-
-#field {
-    margin-bottom:20px;
-}
-    </style>
-    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript">
-        window.alert = function(){};
-        var defaultCSS = document.getElementById('bootstrap-css');
-        function changeCSS(css){
-            if(css) $('head > link').filter(':first').replaceWith('<link rel="stylesheet" href="'+ css +'" type="text/css" />'); 
-            else $('head > link').filter(':first').replaceWith(defaultCSS); 
-        }
-        $( document ).ready(function() {
-          var iframe_height = parseInt($('html').height()); 
-          window.parent.postMessage( iframe_height, 'http://bootsnipp.com');
-        })
-    </script>
-    <script src="/static/add_field.js"></script>
-</head>
-
-<html>
-    <div class="container">
-	<div class="row">
-		<input type="hidden" name="count" value="1" />
-        <div class="control-group" id="fields">
-            <label class="control-label" for="field1">Model Definition</label>
-            <div class="controls" id="profs"> 
-                <form class="input-append">
-                    <div id="field1">
-                        <div class="row">
-                        <input autocomplete="off" class="input" id="field1.name" name="prof1" type="text" placeholder="Model Name" data-items="8"/>
-                        </div>
-                        <div class="row">
-                        <input autocomplete="off" class="input" id="field1.type" name="prof1" type="text" placeholder="Model Type" data-items="8"/>
-                        </div>
-                        <button id="b1" class="btn add-more" type="button">+</button>
-                    </div>
-                </form>
-            <br>
-            <small>Press + to add another form field :)</small>
-            </div>
-        </div>
-	</div>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>Model Genie</title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="static/css/bootstrap.min.css" rel="stylesheet">
+		<!--[if lt IE 9]>
+			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="static/css/styles.css" rel="stylesheet">
+	</head>
+	<body>
+<!-- Header -->
+<div id="top-nav" class="navbar navbar-inverse navbar-static-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-toggle"></span>
+      </button>
+      <a class="navbar-brand" href="#">Control Panel</a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+        
+        <li class="dropdown">
+          <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#">
+          <ul id="g-account-menu" class="dropdown-menu" role="menu">
+            <li><a href="#">My Profile</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div><!-- /container -->
 </div>
+<!-- /Header -->
+
+<!-- Main -->
+<div class="container">
+   
+  <!-- lower section -->
+  <div class="row">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <h4>Create a Model</h4>
+          </div>
+        </div>
+        <div class="panel-body">
+          
+          <form class="form form-vertical">
+            <div class="control-group">
+              <label>Name</label>
+              <div class="controls">
+                <input type="text" class="form-control" placeholder="Enter Name">
+              </div>
+            </div> 
+            <div class="control-group">
+                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#fieldModal">
+                    Add a Field 
+                </button>
+            </div>
+            <div class="container" id="fields">
+            </div>
+            <div class="control-group">
+              <label></label>
+              <div class="controls">
+                <button type="submit" class="btn btn-primary">
+                  Create
+                </button>
+              </div>
+            </div>   
+            
+          </form>
+          
+          
+        </div><!--/panel content-->
+      </div><!--/panel-->
+    </div><!--/col-->
+    
+  </div><!--/row-->
+  
+</div><!--/container-->
+<!-- /Main -->
+
+<!-- field Modal -->
+<div class="modal fade" id="fieldModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+          <form id="fieldForm">
+            <div class="control-group">
+                <label>Name</label>
+                <div class="controls">
+                <input type="text" class="form-control" id="fieldName" placeholder="Name">
+            </div>
+            <div class="control-group">
+              <label>Type</label>
+              <div class="controls">
+                  <select class="form-control" id="fieldType">
+                     <option>StringType</option>
+                     <option>BooleanType</option>
+                     <option>IntType</option>
+                     <option>ModelType</option>
+                     <option>ListType</option>
+                   </select>
+              </div>
+            </div> <!-- end control-group -->
+            <div class="control-group">
+                <label>Choose Model</label>
+                <div class="controls">
+                    <select class="form-control" id="modelType">
+                        <option>Location</option>
+                    </select>
+                </div>
+            </div> <!-- end control-group -->
+            <div class="control-group">
+                <label>Collection Type</label>
+                <div class="controls">
+                    <select class="form-control">
+                        <option>List</option>
+                    </select>
+                </div>
+            </div> <!-- end control-group -->
+            <div class="control-group">
+                <label>Default Value</label>
+                <div class="controls">
+                    <input type="text" class="form-control"
+                    placeholder="Default Value">
+                </div>
+            </div> <!-- end control-group -->
+          </form>
+
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="addFieldSubmit">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+	<!-- script references -->
+        <script src="static/js/jquery-2.1.3.min.js"></script>
+		<script src="static/js/bootstrap.min.js"></script>
+        <script src="static/js/model.js"></script>
+	</body>
 </html>

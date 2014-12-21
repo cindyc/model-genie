@@ -16,11 +16,12 @@ def index():
     """
     return render_template('form.html')
 
-import os
-@app.route('/static/<path:static_file>')
+#@app.route('/static/<path:static_file>')
+#@app.route('/css/<path:static_file>')
 def static_proxy(static_file):
     # send_static_file will guess the correct MIME type
-    return app.send_static_file(os.path.join('static', static_file))
+    print 'Returning {}'.format(os.path.join('static', 'css', static_file))
+    return app.send_static_file(os.path.join('static', 'css', static_file))
 
 if __name__ == '__main__':
     app.run(debug=True)
