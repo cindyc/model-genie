@@ -11,6 +11,7 @@
 			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
 		<link href="static/css/styles.css" rel="stylesheet">
+		<link href="static/css/global.css" rel="stylesheet">
 	</head>
 	<body>
 <!-- Header -->
@@ -57,12 +58,22 @@
                 <input type="text" class="form-control" placeholder="Enter Name">
               </div>
             </div> 
+	    <div id="fields">
+	    <div class="field-row" id="field-row-template">
+	    	<div class="col-xs-2">name: </div><div class="col-md-10" id="name">Location</div>
+	    	<div class="col-xs-2">type: </div><div class="col-md-10" id="type">String</div>
+		<div class="col-xs-2">choices: </div><div class="col-md-10" id="choices">None</div>
+    		<div class="col-xs-2">is_required: </div><div class="col-md-10" id="is_required">False</div>
+    		<div class="col-xs-2">min_size: </div><div class="col-md-10" id="min_size">None</div>
+    		<div class="col-xs-2">max_size: </div><div class="col-md-10" id="max_size">None</div>
+		<div class="col-xs-2">compound_type: </div><div class="col-md-10" id="compound_type">None</div>
+		<div class="col-xs-2">messages: </div><div class="col-md-10" id="messages">None</div>
+	    </div> <!-- end of fieldDefinition -->
+    	    </div>
             <div class="control-group">
-                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#fieldModal">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#fieldModal">
                     Add a Field 
                 </button>
-            </div>
-            <div class="container" id="fields">
             </div>
             <div class="control-group">
               <label></label>
@@ -91,7 +102,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+        <h4 class="modal-title" id="myModalLabel">Field Definition</h4>
       </div>
       <div class="modal-body">
           <form id="fieldForm">
@@ -141,8 +152,8 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" id="addFieldSubmit">Create</button>
-      </div>
-    </div>
+      </div><!-- modal-footer end -->
+    </div> <!-- modal end -->
   </div>
 </div>
  
