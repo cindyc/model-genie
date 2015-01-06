@@ -2,10 +2,11 @@ var FieldRow = {
     _row: $("#field-row-template"),
     create: function(data, append_to) {
        console.log("FieldRow.create(): " + data); 
+       console.log(data); 
        var newRow = this._row.clone(); 
        for (var key in data) {
-	   var newRowAttr = newRow.find("#"+key); 
-	   newRowAttr.html(data[key]);  
+	       var newRowAttr = newRow.find("#"+key); 
+	       newRowAttr.html(data[key]);  
        }
        $("#fields").append(newRow); 
        newRow.show(); 
@@ -17,9 +18,10 @@ var FieldForm = {
     _form: $("#fieldForm"),
     fieldName: $("#fieldForm #fieldName"),
     fieldType: $("#fieldForm #fieldType"),
+    fieldDefault: $("#fieldForm #fieldDefault"),
     modelType: this.find("modelType"),
     submitButton : $("submit"),
-    _fields: [fieldName, fieldType, modelType],
+    _fields: [fieldName, fieldType, fieldDefault, modelType],
 
     onSubmit: function(){
         console.log("FieldForm.onSubmit"); 
@@ -27,9 +29,11 @@ var FieldForm = {
             console.log("_field is " + FieldForm._fields[i].value); 
         }
         var data = {"name": FieldForm._fields[0].value,
-	    "type": FieldForm._fields[1].value
-	   };
-	FieldRow.create(data); 
+	                "type": FieldForm._fields[1].value,
+                    "default_value": FieldForm._fields[2].value,
+                    "model": FieldForm._fields[3].value,
+	               };
+	    FieldRow.create(data); 
     }
 
 };

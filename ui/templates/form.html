@@ -66,6 +66,7 @@
     		<div class="col-xs-2">is_required: </div><div class="col-md-10" id="is_required">False</div>
     		<div class="col-xs-2">min_size: </div><div class="col-md-10" id="min_size">None</div>
     		<div class="col-xs-2">max_size: </div><div class="col-md-10" id="max_size">None</div>
+            <div class="col-xs-2">default_value: </div><div class="col-md-10" id="default_value">None</div>
 		<div class="col-xs-2">compound_type: </div><div class="col-md-10" id="compound_type">None</div>
 		<div class="col-xs-2">messages: </div><div class="col-md-10" id="messages">None</div>
 	    </div> <!-- end of fieldDefinition -->
@@ -132,17 +133,9 @@
                 </div>
             </div> <!-- end control-group -->
             <div class="control-group">
-                <label>Collection Type</label>
-                <div class="controls">
-                    <select class="form-control">
-                        <option>List</option>
-                    </select>
-                </div>
-            </div> <!-- end control-group -->
-            <div class="control-group">
                 <label>Default Value</label>
                 <div class="controls">
-                    <input type="text" class="form-control"
+                    <input type="text" class="form-control" id="fieldDefault"
                     placeholder="Default Value">
                 </div>
             </div> <!-- end control-group -->
