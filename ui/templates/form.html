@@ -51,7 +51,7 @@
         </div>
         <div class="panel-body">
           
-          <form class="form form-vertical">
+          <form class="form form-vertical" id="modelForm">
             <div class="control-group">
               <label>Name</label>
               <div class="controls">
@@ -59,7 +59,7 @@
               </div>
             </div> 
 	    <div id="fields">
-	    <div class="field-row" id="field-row-template">
+	    <div class="field-row-template" id="field-row-template">
 	    	<div class="col-xs-2">name: </div><div class="col-md-10" id="name">Location</div>
 	    	<div class="col-xs-2">type: </div><div class="col-md-10" id="type">String</div>
 		<div class="col-xs-2">choices: </div><div class="col-md-10" id="choices">None</div>
@@ -79,8 +79,8 @@
             <div class="control-group">
               <label></label>
               <div class="controls">
-                <button type="submit" class="btn btn-primary">
-                  Create
+                <button type="submit" class="btn btn-primary" id="modelSubmit">
+                  Create Model
                 </button>
               </div>
             </div>   
