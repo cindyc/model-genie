@@ -1,11 +1,32 @@
+// The script for modelForm handling
+// TODO(cc): This script needs some serious cleanup
+API_HOST = "127.0.0.1"
+API_PORT = 5500
+
 var ModelForm = {
     _form: $("#modelForm"),
     submitButton: $("#modelForm submit"),
+    //CREATE_URL: "http://" + API_HOST + ":" + API_PORT + "/api/modeltype/create",
+    CREATE_URL: "http://127.0.0.1:5500/api/modeltype/create",
 
     onSubmit: function(){
         console.log("Submitting modelForm"); 
-	var fieldValues = ModelForm.getFieldValues(); 
-	console.dir(fieldValues); 
+	    var modelName = ModelForm._form.find("#modelName").val()
+	    var fieldAttrs = ModelForm.getFieldValues(); 
+	    console.dir(fieldAttrs); 
+        var formData = {
+            "name": modelName,
+            "fields": fieldAttrs
+        }
+	    $.ajax({
+            type: "POST",
+            url: this.CREATE_URL,
+            data: JSON.stringify(formData),
+            contentType: "application/json;charset=UTF-8",
+            success: function(data) {
+                console.log("POST modelForm Successful: data=" + data); 
+            },
+        })
     },
 
     getFieldValues: function(){
