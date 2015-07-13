@@ -1,6 +1,32 @@
 import importlib
 import inspect
-from entity.definitions import EntityDefinition, PropertyDefinition
+from modelgenie.definitions import ModelDefinition, PropertyDefinition
+
+
+class Model(object):
+    """Base class for model
+    """
+    pass
+
+
+class PersistableModel():
+    """A model that can be serialized along with its definition
+    """
+    _ModelImpl = None
+    _definition = None
+
+    def __init__(self, **kwargs):
+        """Create and initialize the model instance
+        """
+        for k, v in kwargs.iteritems():
+            if hasattr(self, k):
+                setattr(self, k, v)
+
+    def save(self):
+        """Serialize the model and save it
+        """
+        if hasattr(self, "serialize"):
+            serialized = getattr(self, 'serialize')()
 
 
 class Types(object):
@@ -16,13 +42,13 @@ class ModelProxy(object):
     """Base class of ModelProxy
     """
     # The subclass will assign this
-    _Model = None
+    _ModelImpl = None
 
     @classmethod
     def get_definition(cls, model):
-        """Extract EntityDefinition from a Schematics Model
+        """Extract ModelDefinition from a ModelImpl
         """
-        entity_def = EntityDefinition(name=model.__name__, type=model.__name__)
+        model_def = ModelDefinition(name=model.__name__, type=model.__name__)
         for field_name, field_type in model._fields.iteritems():
             # get the schematics field type and convert to our field type
             field_type_data = field_type.__dict__
@@ -39,37 +65,42 @@ class ModelProxy(object):
                     if getter_key == 'owner_model':
                         field_value = ''
                     setattr(property_def, def_name, field_value)
-            entity_def.property_definitions.append(property_def)
-        return entity_def
+            model_def.property_definitions.append(property_def)
+        return model_def
 
 
     @classmethod
-    def get_model(cls, entity_def):
-        """Create a Model based on EntityDefinition
+    def get_model(cls, model_def):
+        """Convert a ModelDefinition into ModelImpl
         """
-        # entity_def can be passed in as EntityDefinition or dict
-        if isinstance(entity_def, EntityDefinition):
-            entity_def = entity_def.serialize()
+        # model_def can be passed in as ModelDefinition or dict
+        if isinstance(model_def, ModelDefinition):
+            model_def = model_def.serialize()
 
         cls_attrs = {}
-        for property_def in entity_def['property_definitions']:
+        cls_attrs["_definition"] = model_def
+        for property_def in model_def['property_definitions']:
             property_name = property_def['name']
             field_impl = cls._to_field_impl(property_def)
             cls_attrs[property_name] = field_impl
         # TODO(cc) fix this hack transform unicode to str
-        class_name = str(entity_def['name'])
-        klass = type(class_name, (cls._Model, ), cls_attrs)
-        return klass
+        class_name = str(model_def['name'])
+        print 'cls._ModelImpl is {}'.format(cls._ModelImpl)
+        model_impl = type(class_name, (cls._ModelImpl, ), cls_attrs)
+        # TODO(cc): use this hack for now because the meta method 
+        # creates a model under schematics.models. Fix later.
+        model_impl.__module__ = cls._ModelImpl.__module__
+        return model_impl
 
     @classmethod
-    def create_model(cls, entity_def):
-        """Create a model with embedded entity_definition
+    def create_model_instance(cls, model_def):
+        """Create a model instance with embedded model_definition
         """
-        if isinstance(entity_def, EntityDefinition):
-            entity_def = entity_def.serialize()
-        entity = cls.get_model(entity_def)().serialize()
-        entity["entity_definition"] = entity_def
-        return entity
+        if isinstance(model_def, ModelDefinition):
+            model_def = model_def.serialize()
+        model_inst = cls.get_model(model_def)().serialize()
+        model_inst["model_definition"] = model_def
+        return model_inst
 
 
     @classmethod
@@ -104,21 +135,21 @@ class ModelProxy(object):
         if imp_type_name.split('.')[-1] in ('ListType', 'ModelType'):
             return (field_type_def, cls._to_compound_type_def(field))
         else:
-            return (field_type_def, {'entity_def': field_type_def})
+            return (field_type_def, {'model_def': field_type_def})
 
     @classmethod
     def _to_compound_type_def(cls, field):
-        """Give a compound schematics field type, return a EntityDefinition
+        """Give a compound schematics field type, return a ModelDefinition
         """
         field_type = field.__class__.__name__
         if field_type == 'ModelType':
             model_class = field.model_class
-            entity_def = cls.get_definition(model_class)
-            return entity_def._to_model_type()
+            model_def = cls.get_definition(model_class)
+            return model_def._to_model_type()
         elif field_type == 'ListType':
             model_class = field.field.model_class
-            entity_def = cls.get_definition(model_class)
-            return entity_def._to_list_type()
+            model_def = cls.get_definition(model_class)
+            return model_def._to_list_type()
         else:
             return None
 
@@ -147,8 +178,8 @@ class ModelProxy(object):
         """Turn a field_def into a impl specific compound type
         """
         if field_def['type'] == 'Model':
-            entity_def = field_def['compound_type']['entity_def']
-            model_class = cls.get_model(entity_def)
+            model_def = field_def['compound_type']['model_def']
+            model_class = cls.get_model(model_def)
             model_impl_type_name = cls.field_type_mapping['Model']
             model_impl_type = cls._load_class(model_impl_type_name)
             return model_impl_type(model_class)

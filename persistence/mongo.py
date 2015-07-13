@@ -84,10 +84,10 @@ class MongoDbProvider(DbProvider):
         #if not hasattr(obj, '_id') or not obj._id:
         if not "_id" in obj or not obj["_id"]:
             print 'obj does not exist in db: {}'.format(obj)
-            # this is necessary for mongodb to auto-generate the _id field 
+            # this is necessary for mongodb to auto-generate the _id field
             if "_id" in obj:
                 obj.pop('_id')
-            # TODO(cc) is there anyway to have insert_one() return the doc? 
+            # TODO(cc) is there anyway to have insert_one() return the doc?
             inserted_id = self._collection.insert_one(obj).inserted_id
             print 'inserted_id is {}'.format(inserted_id)
             result = self.get(inserted_id)

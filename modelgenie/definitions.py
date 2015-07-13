@@ -1,17 +1,10 @@
 from collections import OrderedDict
 
-from schematics.models import Model
-from schematics.types.base import (StringType, IntType,
+from carbon.models import Model
+from carbon.types.base import (StringType, IntType,
                                    BooleanType)
-from schematics.types.compound import ListType, DictType, ModelType
-from schematics.types.serializable import serializable
+from carbon.types.compound import ListType, DictType, ModelType
 
-"""
-@TODO:
-- Don't use schematics for validating and serializing definitions, this
-  is just for prototyping
-
-"""
 
 class Definition(Model):
     """Base class of definitions.
@@ -39,6 +32,7 @@ class Definition(Model):
 
     def _set_custom_attrs(self, attrs):
         pass
+
 
 class DefinitionError(Exception):
     pass
@@ -82,7 +76,7 @@ class PropertyDefinition(Definition):
     compound_type = DictType(StringType(), StringType())
 
 
-class EntityDefinition(Definition):
+class ModelDefinition(Definition):
     """Defines a Model
     """
     bases = ListType(StringType(), default=[])

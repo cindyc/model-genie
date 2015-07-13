@@ -22,5 +22,3 @@ class Persistence(object):
             _dict[ID] = str(uuid.uuid4())
         json_str = json.dumps(_dict, indent=4)
         return json_str
-
-
