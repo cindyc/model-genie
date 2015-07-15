@@ -46,9 +46,10 @@ class MongoDbProvider(DbProvider):
             obj = {}
         return obj
 
-    def list(self):
-        """List all the entities
+    def list(self, model_type="Model"):
+        """List all model instances
         """
+        self._collection = self._db[model_type]
         print 'mongo.list()'
         objs = list(self._collection.find())
         print 'objs are {}'.format(objs)
@@ -59,11 +60,19 @@ class MongoDbProvider(DbProvider):
             result += [obj, ]
         return objs
 
-    def find_by_entitydef(self, entitydef_id):
-        """Find the entities by their entitydef_id
+    def list_by_definition(self, definition):
+        """Find the entities by their definition
+        definition can be a string (uuid) or a dict 
         """
-        print 'find_by_entitydef: entitydef_id={}='.format(entitydef_id)
-        objs = list(self._collection.find({"entity_definition._id": entitydef_id}))
+        print 'list_by_definition: definition is {}'.format(definition)
+        if type(definition) == dict: 
+            def_id = definition["_id"]
+        elif type(definition) == str: 
+            def_id = definition
+        else: 
+            raise DbProviderError("Invalid definition, can be either str(UUID) or dict")
+        print 'find_by_definition: def_id={}='.format(def_id)
+        objs = list(self._collection.find({"_definition._id": def_id}))
         result = []
         for obj in objs:
             obj["_id"] = str(obj['_id'])
@@ -76,7 +85,7 @@ class MongoDbProvider(DbProvider):
         print 'data is {}'.format(data)
         collection = self._db[model_type] if model_type else self._collection
         if type(data) == list:
-            result = self._collection.insert_many(obj).inserted_ids
+            result = collection.insert_many(obj).inserted_ids
         elif type(data) != dict:
             obj = data.serialize()
         else:
@@ -88,12 +97,12 @@ class MongoDbProvider(DbProvider):
             if "_id" in obj:
                 obj.pop('_id')
             # TODO(cc) is there anyway to have insert_one() return the doc?
-            inserted_id = self._collection.insert_one(obj).inserted_id
+            inserted_id = collection.insert_one(obj).inserted_id
             print 'inserted_id is {}'.format(inserted_id)
-            result = self.get(inserted_id)
+            result = self.get(inserted_id, model_type)
         else:
             print 'obj exists: {}'.format(obj)
-            updated = self._collection.find_and_modify({'_id': ObjectId(obj._id)}, obj)
+            updated = collection.find_and_modify({'_id': ObjectId(obj._id)}, obj)
             result = updated
             print 'update result is {}'.format(result)
         return result

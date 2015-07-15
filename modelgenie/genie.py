@@ -60,11 +60,13 @@ class ModelGenie(object):
         if type(inst) != dict:
             definition = inst.__class__._definition
             inst = inst.serialize()
-            inst['_definition'] = definition
-        if "_id" not in inst['_definition'] or not inst['_definition']['_id']:
-            saved = cls._save_definition(inst['_definition'])
-        inst["_definition"]['_id'] = saved['_id']
-        saved = cls._db.save(inst, 'Model')
+        print '**definition = {}'.format(definition)
+        if "_id" not in definition or definition['_id'] == None:
+            saved_definition = cls._save_definition(definition)
+            print 'saved_definition is {}'.format(saved_definition)
+        inst["_definition"]= {"_id": saved_definition["_id"]}
+        saved = cls._db.save(inst)
+        print 'saved is {}'.format(saved)
         return saved
 
     @classmethod
@@ -78,12 +80,14 @@ class ModelGenie(object):
         return saved
 
     @classmethod
-    def get(cls, id): 
+    def get(cls, id=None): 
         """Get a model instance
+        Return the last inst if id is not provided
         """
         inst = cls._db.get(id, "Model")
+        print 'inst = {}'.format(inst)
         definition_id = inst["_definition"]["_id"]
-        definition = cls._get_definition[definition_id]
+        definition = cls._get_definition(definition_id)
         inst['_definition'] = definition
         return inst
 
@@ -92,3 +96,10 @@ class ModelGenie(object):
         """Get model definition
         """
         return cls._db.get(id, 'ModelDefinition')
+
+    @classmethod
+    def list(cls, model_type=None): 
+        """List all instances for a model type
+        """
+        instances = cls._db.list(model_type)
+        return instances
