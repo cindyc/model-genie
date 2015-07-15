@@ -36,19 +36,19 @@ class ModelGenie(object):
     _db = DB
 
     @classmethod
-    def get_definition(cls, model):
+    def create_definition(cls, model):
         """Convert a model to model_definition
         """
         return cls._proxy.get_definition(model)
 
     @classmethod
-    def get_model(cls, model_def):
+    def create_model(cls, model_def):
         """Convert a ModelDefinition to a ModelImpl
         """
         return cls._proxy.get_model(model_def)
 
     @classmethod
-    def get_instance(cls, model_def):
+    def create_instance(cls, model_def):
         """Create an instance of based on model definition
         """
         return cls._proxy.get_instance(model_def)
@@ -62,7 +62,7 @@ class ModelGenie(object):
             inst = inst.serialize()
         print '**definition = {}'.format(definition)
         if "_id" not in definition or definition['_id'] == None:
-            saved_definition = cls._save_definition(definition)
+            saved_definition = cls.save_definition(definition)
             print 'saved_definition is {}'.format(saved_definition)
         inst["_definition"]= {"_id": saved_definition["_id"]}
         saved = cls._db.save(inst)
@@ -70,7 +70,7 @@ class ModelGenie(object):
         return saved
 
     @classmethod
-    def _save_definition(cls, definition):
+    def save_definition(cls, definition):
         """Save the definition of a model
         """
         if type(definition) != dict:
@@ -80,26 +80,53 @@ class ModelGenie(object):
         return saved
 
     @classmethod
-    def get(cls, id=None): 
+    def get(cls, id=None):
         """Get a model instance
         Return the last inst if id is not provided
         """
         inst = cls._db.get(id, "Model")
         print 'inst = {}'.format(inst)
         definition_id = inst["_definition"]["_id"]
-        definition = cls._get_definition(definition_id)
+        definition = cls.get_definition(definition_id)
         inst['_definition'] = definition
         return inst
 
     @classmethod
-    def _get_definition(cls, id):
+    def get_definition(cls, id):
         """Get model definition
         """
         return cls._db.get(id, 'ModelDefinition')
 
     @classmethod
-    def list(cls, model_type=None): 
+    def list(cls, model_type="Model"):
         """List all instances for a model type
         """
-        instances = cls._db.list(model_type)
+        instances = cls._db.find(model_type)
         return instances
+
+    @classmethod
+    def list_by_definition(cls, definition):
+        """Find the entities by their definition
+        definition can be a string (uuid) or a dict
+        """
+        print 'list_by_definition: definition is {}'.format(definition)
+        if type(definition) == dict:
+            def_id = definition["_id"]
+        elif type(definition) == str:
+            def_id = definition
+        else:
+            raise DbProviderError("Invalid definition, can be either str(UUID) or dict")
+        print 'find_by_definition: def_id={}='.format(def_id)
+        return cls._db.find("Model", {"_definition._id": def_id})
+
+    @classmethod
+    def delete(cls, id):
+        """Delete a model by id
+        """
+        pass
+
+    @classmethod
+    def delete_definition(cls, id):
+        """Delete a model definition by id
+        """
+        pass

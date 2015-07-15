@@ -46,36 +46,20 @@ class MongoDbProvider(DbProvider):
             obj = {}
         return obj
 
-    def list(self, model_type="Model"):
+    def find(self, model_type="Model", filter=None):
         """List all model instances
         """
-        self._collection = self._db[model_type]
+        collection = self._db[model_type]
         print 'mongo.list()'
-        objs = list(self._collection.find())
+        if filter: 
+            objs = list(collection.find(filter))
+        else:
+            objs = list(collection.find())
         print 'objs are {}'.format(objs)
         result = []
         # hack to convert uuid to string
         for obj in objs:
             obj['_id'] = str(obj['_id'])
-            result += [obj, ]
-        return objs
-
-    def list_by_definition(self, definition):
-        """Find the entities by their definition
-        definition can be a string (uuid) or a dict 
-        """
-        print 'list_by_definition: definition is {}'.format(definition)
-        if type(definition) == dict: 
-            def_id = definition["_id"]
-        elif type(definition) == str: 
-            def_id = definition
-        else: 
-            raise DbProviderError("Invalid definition, can be either str(UUID) or dict")
-        print 'find_by_definition: def_id={}='.format(def_id)
-        objs = list(self._collection.find({"_definition._id": def_id}))
-        result = []
-        for obj in objs:
-            obj["_id"] = str(obj['_id'])
             result += [obj, ]
         return objs
 
