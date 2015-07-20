@@ -60,11 +60,13 @@ class ModelGenie(object):
         if type(inst) != dict:
             definition = inst.__class__._definition
             inst = inst.serialize()
+        else:
+            definition = inst["_definition"]
         print '**definition = {}'.format(definition)
         if "_id" not in definition or definition['_id'] == None:
-            saved_definition = cls.save_definition(definition)
-            print 'saved_definition is {}'.format(saved_definition)
-        inst["_definition"]= {"_id": saved_definition["_id"]}
+            definition = cls.save_definition(definition)
+            print 'saved definition is {}'.format(definition)
+        inst["_definition"]= {"_id": definition["_id"]}
         saved = cls._db.save(inst)
         print 'saved is {}'.format(saved)
         return saved
@@ -117,7 +119,14 @@ class ModelGenie(object):
         else:
             raise DbProviderError("Invalid definition, can be either str(UUID) or dict")
         print 'find_by_definition: def_id={}='.format(def_id)
-        return cls._db.find("Model", {"_definition._id": def_id})
+        # Get the definition from db and add to each model
+        definition = cls.get_definition(def_id)
+        result = cls._db.find("Model", {"_definition._id": def_id})
+        insts = []
+        for data in result: 
+            data["_definition"] = definition
+            insts += [data, ]
+        return insts
 
     @classmethod
     def delete(cls, id):
