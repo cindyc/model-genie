@@ -6,15 +6,18 @@ from setuptools import setup
 
 from modelgenie import __version__
 
+requirements = [
+        'flask>=0.10.1',
+        'flask-restful',
+        'flask-cors',
+        'pymongo==3.0.1',
+        'schematics',
+        'six',
+]
 
-REQUIREMENTS_FILE = 'requirements.txt'
-DEV_REQUIREMENTS_FILE = 'dev-requirements.txt'
-
-
-dev_requirements = open(
-        os.path.join(os.path.dirname(__file__), DEV_REQUIREMENTS_FILE)).read().split()
-requirements = open(
-        os.path.join(os.path.dirname(__file__), REQUIREMENTS_FILE)).read().split()
+dev_requirements = [
+        'pytest==2.7.2',
+]
 
 setup(
     name='modelgenie',
@@ -25,7 +28,7 @@ setup(
     author_email='cindy@datanarra.com',
     url='http://github.com/cindyc/datanarra/modelgenie',
     install_requires=[requirements, dev_requirements],
-    packages=['modelgenie', 'persistence', 'api'],
+    packages=['modelgenie', 'persistence', 'rest', 'carbon'],
     classifiers=[
         'Environment :: Other Environment',
         'Intended Audience :: Developers',
