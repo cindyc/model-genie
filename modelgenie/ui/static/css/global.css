@@ -1,0 +1,13 @@
+.control-group {
+  margin-top: 15px;
+}
+.field-row {
+  border: 1px solid #ccc;
+  padding-top:5px;
+  padding-bottom:5px;
+  background-color: #fff;
+  color: #555;
+  border-radius: 4px;
+  height: 175px;
+  margin-top: 15px;
+}
