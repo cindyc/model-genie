@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>Model Genie</title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="static/css/bootstrap.min.css" rel="stylesheet">
+		<!--[if lt IE 9]>
+			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="static/css/styles.css" rel="stylesheet">
+		<link href="static/css/global.css" rel="stylesheet">
+	</head>
+	<body>
+<!-- Header -->
+<div id="top-nav" class="navbar navbar-inverse navbar-static-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-toggle"></span>
+      </button>
+      <a class="navbar-brand" href="#">Control Panel</a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+        
+        <li class="dropdown">
+          <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#">
+          <ul id="g-account-menu" class="dropdown-menu" role="menu">
+            <li><a href="#">My Profile</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div><!-- /container -->
+</div>
+<!-- /Header -->
+
+<!-- Main -->
+<div class="container">
+   
+  <!-- lower section -->
+  <div class="row">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="panel-title">
+            <h4>Create a Model</h4>
+          </div>
+        </div>
+        <div class="panel-body">
+          
+          <form class="form form-vertical" id="modelForm">
+            <div class="control-group">
+              <label>Name</label>
+              <div class="controls">
+                <input type="text" class="form-control" id="modelName" placeholder="Enter Name">
+              </div>
+            </div> 
+	    <div id="fields">
+	    <div class="field-row-template" id="field-row-template">
+	    	<div class="col-xs-2">name: </div><div class="col-md-10" id="name">Location</div>
+	    	<div class="col-xs-2">type: </div><div class="col-md-10" id="type">String</div>
+		<div class="col-xs-2">choices: </div><div class="col-md-10" id="choices">None</div>
+    		<div class="col-xs-2">is_required: </div><div class="col-md-10" id="is_required">False</div>
+    		<div class="col-xs-2">min_size: </div><div class="col-md-10" id="min_size">None</div>
+    		<div class="col-xs-2">max_size: </div><div class="col-md-10" id="max_size">None</div>
+            <div class="col-xs-2">default_value: </div><div class="col-md-10" id="default_value">None</div>
+		<div class="col-xs-2">compound_type: </div><div class="col-md-10" id="compound_type">None</div>
+		<div class="col-xs-2">messages: </div><div class="col-md-10" id="messages">None</div>
+	    </div> <!-- end of fieldDefinition -->
+    	    </div>
+            <div class="control-group">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#fieldModal">
+                    Add a Field 
+                </button>
+            </div>
+            <div class="control-group">
+              <label></label>
+              <div class="controls">
+                <button type="submit" class="btn btn-primary" id="modelSubmit">
+                  Create Model
+                </button>
+              </div>
+            </div>   
+            
+          </form>
+          
+          
+        </div><!--/panel content-->
+      </div><!--/panel-->
+    </div><!--/col-->
+    
+  </div><!--/row-->
+  
+</div><!--/container-->
+<!-- /Main -->
+
+<!-- field Modal -->
+<div class="modal fade" id="fieldModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Field Definition</h4>
+      </div>
+      <div class="modal-body">
+          <form id="fieldForm">
+            <div class="control-group">
+                <label>Name</label>
+                <div class="controls">
+                <input type="text" class="form-control" id="fieldName" placeholder="Name">
+            </div>
+            <div class="control-group">
+              <label>Type</label>
+              <div class="controls">
+                  <select class="form-control" id="fieldType">
+                     <option>StringType</option>
+                     <option>BooleanType</option>
+                     <option>IntType</option>
+                     <option>ModelType</option>
+                     <option>ListType</option>
+                   </select>
+              </div>
+            </div> <!-- end control-group -->
+            <div class="control-group">
+                <label>Choose Model</label>
+                <div class="controls">
+                    <select class="form-control" id="modelType">
+                        <option>Location</option>
+                    </select>
+                </div>
+            </div> <!-- end control-group -->
+            <div class="control-group">
+                <label>Default Value</label>
+                <div class="controls">
+                    <input type="text" class="form-control" id="fieldDefault"
+                    placeholder="Default Value">
+                </div>
+            </div> <!-- end control-group -->
+          </form>
+
+        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="addFieldSubmit">Create</button>
+      </div><!-- modal-footer end -->
+    </div> <!-- modal end -->
+  </div>
+</div>
+ 
+	<!-- script references -->
+        <script src="static/js/jquery-2.1.3.min.js"></script>
+		<script src="static/js/bootstrap.min.js"></script>
+        <script src="static/js/model.js"></script>
+	</body>
+</html>

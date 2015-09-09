@@ -1,4 +1,4 @@
-model-genie
+ModelGenie
 =============
 Turn unstructured data into structured data.
 
