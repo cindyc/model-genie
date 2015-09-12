@@ -4,8 +4,8 @@ import glob
 import json
 import uuid
 
-from persistence.base import (Persistence, PersistenceException,
-                              DbConfig)
+from modelgenie.persistence.base import (Persistence, PersistenceException,
+                                         DbConfig)
 
 ID = 'id'
 KIND = 'kind'

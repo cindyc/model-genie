@@ -41,7 +41,7 @@ setup(
     author_email='cindy@datanarra.com',
     url='http://github.com/cindyc/datanarra/modelgenie',
     install_requires=[requirements, dev_requirements],
-    packages=['modelgenie', 'persistence', 'rest', 'carbon'],
+    packages=['modelgenie'],
     classifiers=[
         'Environment :: Other Environment',
         'Intended Audience :: Developers',

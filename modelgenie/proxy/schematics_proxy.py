@@ -10,7 +10,7 @@ from schematics.models import Model
 from schematics.types.base import * 
 from schematics.types.compound import *
 
-from modelgenie.definitions import ModelDefinition, FieldDefinition
+from modelgenie.definitions import ModelDefinition, PropertyDefinition
 from modelgenie.proxy.base import ModelProxy, Types
 
 

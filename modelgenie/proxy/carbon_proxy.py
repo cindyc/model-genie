@@ -1,33 +1,33 @@
-"""Proxy for Schematics
+"""Proxy for CarbonModel
 """
 import json
 from collections import OrderedDict
 import inspect
 
-from schematics.models import Model
+from modelgenie.carbon.models import Model as CarbonModel
 # these imports are necessary for globals() to work
 # they'll be fixed
-from schematics.types.base import *
-from schematics.types.compound import *
+from modelgenie.carbon.types.base import *
+from modelgenie.carbon.types.compound import *
 
 from modelgenie.proxy.base import ModelProxy, Types
 
 
-class SchematicsProxy(ModelProxy):
+class CarbonProxy(ModelProxy):
 
-    _ModelImpl = Model
+    _ModelImpl = CarbonModel
 
     # TODO (cc) complete this
     field_type_mapping = {
-        Types.String: 'schematics.types.base.StringType',
-        Types.Int: 'schematics.types.base.IntType',
-        Types.Boolean: 'schematics.types.base.BooleanType',
-        Types.Time: 'schematics.types.base.DateTimeType',
-        Types.List: 'schematics.types.compound.ListType',
-        Types.Model: 'schematics.types.compound.ModelType',
+        Types.String: 'modelgenie.carbon.types.base.StringType',
+        Types.Int: 'modelgenie.carbon.types.base.IntType',
+        Types.Boolean: 'modelgenie.carbon.types.base.BooleanType',
+        Types.Time: 'modelgenie.carbon.types.base.DateTimeType',
+        Types.List: 'modelgeniecarbon.types.compound.ListType',
+        Types.Model: 'modelgenie.carbon.types.compound.ModelType',
     }
 
-    # mapping the FieldDefnition keys to the schematics field definition
+    # mapping the FieldDefnition keys to the carbon field definition
     # keys
     field_def_key_mapping = {
         'owner_model': 'owner_model',
@@ -61,7 +61,7 @@ class SchematicsProxy(ModelProxy):
         # ModelType(Person)
         #allowed_types = collection_def['allow_types']
         if allowed_type['type'] not in cls.field_type_mapping:
-            # find the ORM modeltype, i.e. schematics.types.compound.ModelType
+            # find the ORM modeltype, i.e. carbon.types.compound.ModelType
             model_type_impl_name = cls.field_type_mapping['Model']
             model_type_impl = cls._load_class(model_type_impl_name)
             # it gets complicated when its a custom model here (i.e.

@@ -1,23 +1,18 @@
 from collections import OrderedDict
 
-from schematics.models import Model
-from schematics.types.base import (StringType, IntType, 
+from carbon.models import Model
+from carbon.types.base import (StringType, IntType,
                                    BooleanType)
-from schematics.types.compound import ListType, DictType, ModelType
+from carbon.types.compound import ListType, DictType, ModelType
 
-"""
-@TODO: 
-- Don't use schematics for validating and serializing definitions, this
-  is just for prototyping
-
-"""
 
 class Definition(Model):
-    """Base class of definitions. 
-    We need validation and serialization of the definitions, 
+    """Base class of definitions.
+    We need validation and serialization of the definitions,
     so definitions need to be models, for now just use schematics.
     Definitions can be persisted just like other models.
     """
+    _id = StringType()
     name = StringType()
     type = StringType()
 
@@ -27,13 +22,20 @@ class Definition(Model):
         super(Definition, self).__init__()
         for key, value in kwargs.iteritems():
             if hasattr(self, key):
-                # this is a hack to allow passing ModelDefinition() instead of 
-                # ModelDefinition().serialize()
-                if type(self._fields[key]) == DictType and type(value) != dict:
-                    setattr(self, key, value.serialize())
-                else:
-                    setattr(self, key, value)
+                # this is a hack to allow passing EntityDefinition() instead of
+                # EntityDefinition().serialize()
+                if value:
+                    if type(self._fields[key]) == DictType and type(value) != dict:
+                        setattr(self, key, value.serialize())
+                    else:
+                        setattr(self, key, value)
 
+    def _set_custom_attrs(self, attrs):
+        pass
+
+
+class DefinitionError(Exception):
+    pass
 
 class TypeDefinition(Definition):
     """Turns a Model into a ModelType
@@ -41,7 +43,7 @@ class TypeDefinition(Definition):
     pass
 
 
-class ModelTypeDefinition(TypeDefinition): 
+class ModelTypeDefinition(TypeDefinition):
     type = 'Model'
     model_def = DictType(StringType(), StringType())
 
@@ -55,14 +57,14 @@ class ListTypeDefinition(TypeDefinition):
     allow_type = DictType(StringType(), StringType())
 
 
-class CollectionDefinition(Definition): 
+class CollectionDefinition(Definition):
     """Defines a Collection
     """
     # collection type can be list or dict
     is_ordered = BooleanType()
     allow_types = ListType(DictType(StringType(), StringType()))
 
-class FieldDefinition(Definition):
+class PropertyDefinition(Definition):
     """Defines a Field
     """
     owner_model = StringType()
@@ -78,7 +80,17 @@ class ModelDefinition(Definition):
     """Defines a Model
     """
     bases = ListType(StringType(), default=[])
-    field_definitions = ListType(ModelType(FieldDefinition), default=[])
+    property_definitions = ListType(ModelType(PropertyDefinition), default=[])
+
+    def init(self, **attrs):
+        if "name" not in attrs:
+            raise DefinitionError("Name for an entity must be defined")
+        self.name = attrs["name"]
+        self.type = attrs["type"] if "type" in attrs else attrs["name"]
+        if "property_definitions" in attrs:
+            for property_data in attrs["property_definitions"]:
+                property_def = PropertyDefinition(**property_data)
+                self.property_definitions += (property_def, )
 
     def _to_model_type(self):
         return ModelTypeDefinition(type='{}Type'.format(self.name),
