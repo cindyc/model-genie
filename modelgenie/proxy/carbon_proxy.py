@@ -41,8 +41,6 @@ class CarbonProxy(ModelProxy):
         'default': '_default',
     }
 
-
-
     @classmethod
     def _to_collection_type_impl(cls, field_def):
         """Turn a field_def into a impl specific List or Dict type
