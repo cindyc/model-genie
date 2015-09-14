@@ -36,10 +36,22 @@ class ModelGenie(object):
     _db = DB
 
     @classmethod
-    def create_definition(cls, model):
-        """Convert a model to model_definition
+    def create_definition(cls, data):
+        """Convert ModelDefinition from dict or a ModelImpl
         """
-        return cls._proxy.get_definition(model)
+        if type(data) == dict: 
+            md = ModelDefinition(**data)
+        return md
+
+    @classmethod
+    def save_definition(cls, definition):
+        """Save the definition of a model
+        """
+        if type(definition) != dict:
+            definition = definition.serialize()
+        # TODO(cc) save property definitions individually
+        saved = cls._db.save(definition, 'ModelDefinition')
+        return saved
 
     @classmethod
     def create_model(cls, model_def):
@@ -71,15 +83,6 @@ class ModelGenie(object):
         print 'saved is {}'.format(saved)
         return saved
 
-    @classmethod
-    def save_definition(cls, definition):
-        """Save the definition of a model
-        """
-        if type(definition) != dict:
-            definition = definition.serialize()
-        # TODO(cc) save property definitions indivisually
-        saved = cls._db.save(definition, 'ModelDefinition')
-        return saved
 
     @classmethod
     def get(cls, id=None):

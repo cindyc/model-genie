@@ -45,7 +45,16 @@ class ModelProxy(object):
     _ModelImpl = None
 
     @classmethod
-    def get_definition(cls, model):
+    def create_definition(cls, data):
+        """Create model definition from json data or from ModelImpl
+        """
+        if type(data) == ModelDefinition:
+            return cls._get_definition_from_impl(data)
+        else: 
+            raise NotImplementedError
+
+    @classmethod
+    def _get_definition_from_impl(cls, model):
         """Extract ModelDefinition from a ModelImpl
         """
         model_def = ModelDefinition(name=model.__name__, type=model.__name__)
@@ -67,6 +76,13 @@ class ModelProxy(object):
                     setattr(property_def, def_name, field_value)
             model_def.property_definitions.append(property_def)
         return model_def
+
+    @classmethod
+    def _get_definition_from_json(cls, json_data):
+        """Get definition from json
+        """
+        data = json_loads(json_data)
+
 
 
     @classmethod

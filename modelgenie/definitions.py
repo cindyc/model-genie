@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from carbon.models import Model
 from carbon.types.base import (StringType, IntType,
-                                   BooleanType)
+                               BooleanType)
 from carbon.types.compound import ListType, DictType, ModelType
 
 
@@ -64,6 +64,7 @@ class CollectionDefinition(Definition):
     is_ordered = BooleanType()
     allow_types = ListType(DictType(StringType(), StringType()))
 
+
 class PropertyDefinition(Definition):
     """Defines a Field
     """
@@ -82,15 +83,14 @@ class ModelDefinition(Definition):
     bases = ListType(StringType(), default=[])
     property_definitions = ListType(ModelType(PropertyDefinition), default=[])
 
-    def init(self, **attrs):
-        if "name" not in attrs:
-            raise DefinitionError("Name for an entity must be defined")
-        self.name = attrs["name"]
-        self.type = attrs["type"] if "type" in attrs else attrs["name"]
-        if "property_definitions" in attrs:
-            for property_data in attrs["property_definitions"]:
-                property_def = PropertyDefinition(**property_data)
-                self.property_definitions += (property_def, )
+    def __init__(self, **kwargs): 
+        """Definition of a model
+        """
+        super(ModelDefinition, self).__init__(**kwargs)
+        _property_defs = []
+        for property_def in self.property_definitions: 
+            _property_defs.append(PropertyDefinition(**property_def))
+        self.property_definitions = _property_defs
 
     def _to_model_type(self):
         return ModelTypeDefinition(type='{}Type'.format(self.name),
